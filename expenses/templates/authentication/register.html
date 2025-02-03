@@ -20,13 +20,13 @@
 
                         {% include 'partials/messages.html' %}
                         <div class="form-group mb-3">
-                            <input type="text" name="username" id="usernameField" class="form-control form-control-sm" placeholder="Username">
+                            <input type="text" name="username" id="usernameField" value="{{ fieldValues.username }}" class="form-control form-control-sm" placeholder="Username">
                         </div>
                         <div class="invalid_feedback invalid-feedback" style="display: none;"></div>
                         <p class="text-sm text-success usernameSuccessOutput"></p>
 
                         <div class="form-group mb-3">
-                            <input type="email" name="email" id="emailField" class="form-control form-control-sm" placeholder="Email">
+                            <input type="email" name="email" id="emailField" value="{{ fieldValues.email }}" class="form-control form-control-sm" placeholder="Email">
                         </div>
                         <div class="emailFeedBackArea invalid-feedback" style="display: none;"></div>
                         <p class="text-sm text-success emailSuccessOutput"></p>
@@ -35,7 +35,7 @@
 {#                            <small class="float-end py-3 showPasswordToggle">SHOW</small>#}
                         </div>
                         <div class="d-grid gap-2">
-                            <input type="submit" value="Register" class="btn btn-primary">
+                            <input type="submit" value="Register" class="btn btn-primary submit-btn">
                         </div>
                     </form>
                 </div>
