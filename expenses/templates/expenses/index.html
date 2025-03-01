@@ -2,14 +2,49 @@
 {% load static %}
 {% block title %}Home{% endblock %}
 {% block content %}
-    <h1>Expenses List</h1>
-    <ul class="list-group">
-        <li class="list-group-item">Bought Beer</li>
-        <li class="list-group-item">Bought Beer</li>
-        <li class="list-group-item">Bought Beer</li>
-        <li class="list-group-item">Bought Beer</li>
-        <li class="list-group-item">Bought Beer</li>
-        <li class="list-group-item">Bought Beer</li>
-        <li class="list-group-item">Bought Beer</li>
-    </ul>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col md-10">
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item">Expenses</li>
+                        <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'add-expenses' %}">My Expenses</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'add-expenses' %}" class="btn btn-primary">Add Expense</a>
+            </div>
+        </div>
+    <div class="container mt-3 table-responsive-sm">
+    {% include 'partials/messages.html' %}
+        {% if expenses.count %}
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>Amount (Currency)</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.amount }}</td>
+                <td>{{ expense.category }}</td>
+                <td>{{ expense.description }}</td>
+                <td>{{ expense.date }}</td>
+                <td><a href="{% url 'expense-edit' expense.id %}" class="btn btn-secondary btn-sm">Edit</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    </div>
+
+
+
 {% endblock %}

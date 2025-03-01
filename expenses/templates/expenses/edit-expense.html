@@ -1,19 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Add Expense{% endblock %}
+{% block title %}Edit Expense{% endblock %}
 {% block content %}
     <div class="container mt-4">
-        <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'expenses' %}">Expenses</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Add Expenses</li>
-            </ul>
-        </nav>
+    <div class="row">
+        <div class="col-md-10">
+            <nav aria-label="breadcrumb">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'expenses' %}">Expenses</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Expense</li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'expense-delete' expense.id %}" class="btn btn-danger btn-sm">Delete</a>
+        </div>
+    </div>
+
 
             <div class="card">
 
                 <div class="card-body">
-                    <form action="{% url 'add-expenses' %}" method="post">
+                    <form action="{% url 'expense-edit' expense.id %}" method="post">
                     {% csrf_token %}
                     {% include 'partials/messages.html' %}
                     <div class="form-group mb-3">
@@ -27,6 +35,7 @@
                     <div class="form-group mb-3">
                         <label for="">Category</label>
                         <select name="category" class="form-control">
+                        <option selected value="{{ values.category }}" name="category">{{ values.category }}</option>
                             {% for category in categories %}
                                <option value="{{ category.name }}" name="category">{{ category.name }}</option>
                             {% endfor %}
@@ -36,7 +45,7 @@
                         <label for="">Date of Expense</label>
                         <input type="date" class="form-control" name="expense_date">
                     </div>
-                        <input type="submit" value="Submit" class="btn btn-primary">
+                        <input type="submit" value="Save" class="btn btn-primary">
                      </form>
                 </div>
 
