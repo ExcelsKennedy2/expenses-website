@@ -47,6 +47,6 @@ def add_income(request):
             return render(request, 'income/add_income.html', context)
 
         UserIncome.objects.create(owner=request.user ,amount=amount, description=description, date=date, source=source)
-        messages.success(request, 'Income successfully added.')
+        messages.success(request, 'Record successfully added.')
 
         return redirect('income')
