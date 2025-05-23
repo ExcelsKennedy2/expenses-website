@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from .models import *
 from django.core.paginator import Paginator
 from userpreferences.models import UserPreference
 from django.contrib import messages
+import json
 
 @login_required(login_url='authentication/login')
 def index(request):
@@ -88,8 +90,21 @@ def income_edit(request, id):
         return redirect('income')
 
 @login_required(login_url='authentication/login')
-def income_expense(request, id):
+def delete_income(request, id):
     income = UserIncome.objects.get(pk=id)
     income.delete()
     messages.success(request, 'Record successfully deleted.')
     return redirect('income')
+
+def search_income(request):
+    if request.method == "POST":
+        search_str = json.loads(request.body).get('searchText')
+
+        income = UserIncome.objects.filter(
+            amount__istartswith=search_str, owner=request.user) | UserIncome.objects.filter(
+            date__istartswith=search_str, owner=request.user) | UserIncome.objects.filter(
+            description__icontains=search_str, owner=request.user) | UserIncome.objects.filter(
+            source__icontains=search_str, owner=request.user)
+
+        data = income.values()
+        return JsonResponse(list(data), safe=False)
