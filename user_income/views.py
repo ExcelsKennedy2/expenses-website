@@ -50,3 +50,46 @@ def add_income(request):
         messages.success(request, 'Record successfully added.')
 
         return redirect('income')
+
+@login_required(login_url='authentication/login')
+def income_edit(request, id):
+    income = UserIncome.objects.get(pk=id)
+    sources = Source.objects.all()
+    context = {
+        'income': income,
+        'values': income,
+        'sources': sources,
+    }
+    if request.method == 'GET':
+        return render(request, 'income/edit-income.html', context)
+    if request.method == 'POST':
+        amount = request.POST['amount']
+
+        if not amount:
+            messages.error(request, 'Please enter amount.')
+            return render(request, 'income/edit-income.html', context)
+
+        description = request.POST['description']
+        date = request.POST['income_date']
+        sources = request.POST['source']
+
+        if not description:
+            messages.error(request, 'Description cannot be empty.')
+            return render(request, 'income/edit-income.html', context)
+
+        income.owner = request.user
+        income.amount=amount
+        income.description=description
+        income.date=date
+        income.source=sources
+        income.save()
+        messages.success(request, 'Record successfully updated.')
+
+        return redirect('income')
+
+@login_required(login_url='authentication/login')
+def income_expense(request, id):
+    income = UserIncome.objects.get(pk=id)
+    income.delete()
+    messages.success(request, 'Record successfully deleted.')
+    return redirect('income')
