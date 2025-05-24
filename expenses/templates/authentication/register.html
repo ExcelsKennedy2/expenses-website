@@ -37,8 +37,12 @@
                         <div class="d-grid gap-2 mb-3">
                             <input type="submit" value="Register" class="btn btn-primary submit-btn">
                         </div>
+                        <div class="container">
+                            <span>Already have an account? <a href="{% url 'login' %}">Sign in</a></span><br>
+                            <span>Forgot Password? <a href="{% url 'request-password' %}">Reset it</a></span>
+                        </div>
                     </form>
-                    <span>Already have an account? <a href="{% url 'login' %}">Sign in</a></span>
+
                 </div>
                 </div>
             </div>
