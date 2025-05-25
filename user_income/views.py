@@ -7,6 +7,20 @@ from userpreferences.models import UserPreference
 from django.contrib import messages
 import json
 
+# @login_required(login_url='authentication/login')
+# def index(request):
+#     source = Source.objects.all()
+#     income = UserIncome.objects.filter(owner=request.user)
+#     paginator = Paginator(income, 5)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+#     currency = UserPreference.objects.get(user=request.user).currency
+#     context = {
+#         'income': income,
+#         'page_obj': page_obj,
+#         'currency': currency,
+#     }
+#     return render(request, 'income/index.html', context)
 @login_required(login_url='authentication/login')
 def index(request):
     source = Source.objects.all()
@@ -14,7 +28,10 @@ def index(request):
     paginator = Paginator(income, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    currency = UserPreference.objects.get(user=request.user).currency
+
+    user_preferences, _ = UserPreference.objects.get_or_create(user=request.user)
+    currency = user_preferences.currency
+
     context = {
         'income': income,
         'page_obj': page_obj,
