@@ -9,10 +9,12 @@ import json
 from django.http import JsonResponse, HttpResponse
 import csv
 import xlwt
-from django.template.loader import render_to_string
-from weasyprint import HTML
-import tempfile
+# from django.template.loader import render_to_string
+# from weasyprint import HTML
+# import tempfile
 from django.db.models import Sum
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 
 def search_expenses(request):
@@ -180,25 +182,40 @@ def export_excel(request):
 
     return response
 
+# def export_pdf(request):
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'inline; attachment; filename=Expenses' + str(datetime.datetime.now()) + '.pdf'
+#     response['Content-Transfer-Encoding'] = 'binary'
+#
+#     expenses = Expense.objects.filter(owner=request.user)
+#
+#     sum = expenses.aggregate(Sum('amount'))
+#
+#     html_string = render_to_string('expenses/pdf-output.html', {'expenses': expenses, 'total': sum['amount__sum']})
+#     html = HTML(string=html_string)
+#
+#     result = html.write_pdf()
+#
+#     with tempfile.NamedTemporaryFile(delete=True) as output:
+#         output.write(result)
+#         output.flush()
+#
+#         output = open(output.name, 'rb')
+#         response.write(output.read())
+#
+#     return response
+
 def export_pdf(request):
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; attachment; filename=Expenses' + str(datetime.datetime.now()) + '.pdf'
-    response['Content-Transfer-Encoding'] = 'binary'
-
     expenses = Expense.objects.filter(owner=request.user)
+    total = expenses.aggregate(Sum('amount'))['amount__sum']
 
-    sum = expenses.aggregate(Sum('amount'))
+    template = get_template("expenses/pdf-output.html")
+    html = template.render({"expenses": expenses, "total": total})
 
-    html_string = render_to_string('expenses/pdf-output.html', {'expenses': expenses, 'total': sum['amount__sum']})
-    html = HTML(string=html_string)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Expenses.pdf"'
 
-    result = html.write_pdf()
-
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        output.write(result)
-        output.flush()
-
-        output = open(output.name, 'rb')
-        response.write(output.read())
-
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors with PDF generation')
     return response
