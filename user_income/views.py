@@ -41,9 +41,9 @@ def index(request):
 
 @login_required(login_url='authentication/login')
 def add_income(request):
-    source = Source.objects.all()
+    sources = Source.objects.all()
     context = {
-        'source': source,
+        'sources': sources,
         'values': request.POST
     }
     if request.method == 'GET':
