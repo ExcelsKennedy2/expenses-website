@@ -163,7 +163,7 @@ class RequestPasswordResetEmail(View):
             return render(request, 'authentication/reset-password.html', context)
 
         current_site = get_current_site(request)
-        user = request.objects.filter(email=email)
+        user = User.objects.filter(email=email)
 
         if user.exists():
             email_contents = {

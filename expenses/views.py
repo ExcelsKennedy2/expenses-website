@@ -30,6 +30,23 @@ def search_expenses(request):
         data = expenses.values()
         return JsonResponse(list(data), safe=False)
 
+# @login_required(login_url='authentication/login')
+# def index(request):
+#     categories = Category.objects.all()
+#     expenses = Expense.objects.filter(owner=request.user)
+#     paginator = Paginator(expenses, 5)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+#     currency = UserPreference.objects.get(user=request.user).currency
+#     context = {
+#         'expenses': expenses,
+#         'page_obj': page_obj,
+#         'currency': currency,
+#     }
+#     return render(request, 'expenses/index.html', context)
+
+from django.core.exceptions import ObjectDoesNotExist
+
 @login_required(login_url='authentication/login')
 def index(request):
     categories = Category.objects.all()
@@ -37,13 +54,19 @@ def index(request):
     paginator = Paginator(expenses, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    currency = UserPreference.objects.get(user=request.user).currency
+
+    try:
+        currency = UserPreference.objects.get(user=request.user).currency
+    except ObjectDoesNotExist:
+        currency = 'USD'  # Or set a sensible default or prompt user to set preferences
+
     context = {
         'expenses': expenses,
         'page_obj': page_obj,
         'currency': currency,
     }
     return render(request, 'expenses/index.html', context)
+
 
 @login_required(login_url='authentication/login')
 def add_expense(request):
