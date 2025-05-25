@@ -27,7 +27,7 @@
                     <div class="form-group mb-3">
                         <label for="">Sources</label>
                         <select name="source" class="form-control">
-                            {% for source in sources %}
+                            {% for source in source %}
                                <option value="{{ source.name }}" name="source">{{ source.name }}</option>
                             {% endfor %}
                         </select>
