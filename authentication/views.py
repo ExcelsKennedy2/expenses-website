@@ -1,20 +1,19 @@
 from django.shortcuts import render, redirect
-from django.utils.translation.trans_null import activate
+# from django.utils.translation.trans_null import activate
 from django.views import View
 import json
 from django.http import JsonResponse
 from django.contrib.auth.models import User
-from gitdb.utils.encoding import force_text
 from validate_email import validate_email
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.contrib import auth
-from django.utils.encoding import force_bytes, DjangoUnicodeDecodeError, force_str
+# from django.utils.encoding import force_bytes, DjangoUnicodeDecodeError, force_str
+from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from .utils import token_generator
-from django.contrib import auth
+# from .utils import token_generator
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
@@ -40,16 +39,66 @@ class UsernameValidationView(View):
             return JsonResponse({'username_error': 'Sorry username in use, choose another one'}, status=409)
         return JsonResponse({'username_valid': True})
 
+# class RegistrationView(View):
+#     def get(self, request):
+#         return render(request, 'authentication/register.html')
+#
+#     def post(self, request):
+#
+#         # GET USER DATA
+#         # VALIDATE
+#         # CREATE A USER ACCOUNT
+#
+#         username = request.POST['username']
+#         email = request.POST['email']
+#         password = request.POST['password']
+#
+#         context = {
+#             'fieldValues': request.POST
+#         }
+#
+#         if not User.objects.filter(username=username).exists():
+#             if not User.objects.filter(email=email).exists():
+#
+#                 if len(password) < 8:
+#                     messages.error(request, 'Password must be at least 8 characters')
+#                     return render(request, 'authentication/register.html', context)
+#
+#                 user = User.objects.create_user(username=username, email=email, password=password)
+#                 user.set_password(password)
+#                 user.is_active = False
+#                 user.save()
+#
+#                 # path to view
+#                 # - getting domain we are on
+#                 # - relative url to verification
+#                 # - encode uid
+#                 # - token
+#                 # uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+#                 # domain = get_current_site(request).domain
+#                 # link = reverse('activate', kwargs={'uidb64': uidb64, 'token': token_generator.make_token(user)})
+#                 # activate_url = 'http://' + domain + link
+#                 # email_subject = 'Activate your account'
+#                 # email_body = 'Hi' + user.username + 'Please use this link to verify your account\n' + activate_url
+#                 # email = EmailMessage(
+#                 #     email_subject,
+#                 #     email_body,
+#                 #     'noreply@example.com',
+#                 #     [email],
+#                 # )
+#                 # email.send(fail_silently=False)
+#                 messages.success(request, 'Your account has been created!')
+#                 return render(request, 'authentication/register.html')
+#
+#
+#
+#         return render(request, 'authentication/register.html')
+
 class RegistrationView(View):
     def get(self, request):
         return render(request, 'authentication/register.html')
 
     def post(self, request):
-
-        # GET USER DATA
-        # VALIDATE
-        # CREATE A USER ACCOUNT
-
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
@@ -60,61 +109,42 @@ class RegistrationView(View):
 
         if not User.objects.filter(username=username).exists():
             if not User.objects.filter(email=email).exists():
-
                 if len(password) < 8:
                     messages.error(request, 'Password must be at least 8 characters')
                     return render(request, 'authentication/register.html', context)
 
                 user = User.objects.create_user(username=username, email=email, password=password)
-                user.set_password(password)
-                user.is_active = False
+                # Remove the line below to avoid deactivating the account
+                # user.is_active = False
                 user.save()
 
-                # path to view
-                # - getting domain we are on
-                # - relative url to verification
-                # - encode uid
-                # - token
-                # uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-                # domain = get_current_site(request).domain
-                # link = reverse('activate', kwargs={'uidb64': uidb64, 'token': token_generator.make_token(user)})
-                # activate_url = 'http://' + domain + link
-                # email_subject = 'Activate your account'
-                # email_body = 'Hi' + user.username + 'Please use this link to verify your account\n' + activate_url
-                # email = EmailMessage(
-                #     email_subject,
-                #     email_body,
-                #     'noreply@example.com',
-                #     [email],
-                # )
-                # email.send(fail_silently=False)
-                messages.success(request, 'Your account has been created!')
-                return render(request, 'authentication/register.html')
+                messages.success(request, 'Your account has been created! You can now log in.')
+                return redirect('login')  # Redirect user to login page immediately
+
+        messages.error(request, 'Username or email already exists')
+        return render(request, 'authentication/register.html', context)
 
 
-
-        return render(request, 'authentication/register.html')
-
-class VerificationView(View):
-    def get(self, request, uidb64, token):
-        try:
-            id = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=id)
-
-            if not token_generator.check_token(user, token):
-                return redirect('login' + '?message' + 'User already activated')
-
-            if user.is_active:
-                return redirect('login')
-            user.is_active = True
-            user.save()
-
-            messages.success(request, 'Your account has been activated successfully!')
-            return redirect('login')
-
-        except Exception as ex:
-            pass
-        return redirect('login')
+# class VerificationView(View):
+#     def get(self, request, uidb64, token):
+#         try:
+#             id = force_str(urlsafe_base64_decode(uidb64))
+#             user = User.objects.get(pk=id)
+#
+#             if not token_generator.check_token(user, token):
+#                 return redirect('login' + '?message' + 'User already activated')
+#
+#             if user.is_active:
+#                 return redirect('login')
+#             user.is_active = True
+#             user.save()
+#
+#             messages.success(request, 'Your account has been activated successfully!')
+#             return redirect('login')
+#
+#         except Exception as ex:
+#             pass
+#         return redirect('login')
 
 class LoginView(View):
     def get(self, request):
@@ -203,7 +233,7 @@ class CompletePasswordReset(View):
         }
 
         try:
-            user_id = force_text(urlsafe_base64_decode(uidb64))
+            user_id = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=user_id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
@@ -230,7 +260,7 @@ class CompletePasswordReset(View):
             return render(request, 'authentication/set-new-password.html', context)
 
         try:
-            user_id = force_text(urlsafe_base64_decode(uidb64))
+            user_id = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=user_id)
             user.set_password(password)
             user.save()
